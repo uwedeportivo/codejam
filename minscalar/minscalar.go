@@ -10,8 +10,9 @@ import (
 )
 
 type vectorData struct {
-	xs []int
-	ys []int
+	xs        []int
+	ys        []int
+	testIndex int
 }
 
 func (vd *vectorData) scalar() int64 {
@@ -24,28 +25,32 @@ func (vd *vectorData) scalar() int64 {
 	return sum
 }
 
-func Execute(input chan string, output chan string, done chan bool) {
+func Parse(testCaseIndex int, input chan string, output chan interface{}) {
+	n := utils.ParseInt(<-input)
 
-	numTestCases := utils.ParseInt(<-input)
+	vd := &vectorData{
+		xs:        make([]int, n),
+		ys:        make([]int, n),
+		testIndex: testCaseIndex,
+	}
 
-	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
-		n := utils.ParseInt(<-input)
+	utils.ParseInts(<-input, vd.xs)
+	utils.ParseInts(<-input, vd.ys)
 
-		vd := &vectorData{
-			xs: make([]int, n),
-			ys: make([]int, n),
-		}
+	output <- vd
+}
 
-		utils.ParseInts(<-input, vd.xs)
-		utils.ParseInts(<-input, vd.ys)
+func Execute(input chan interface{}, output chan string, done chan bool) {
+	for {
+		item := <-input
+		vd := item.(*vectorData)
 
 		sort.Ints(vd.xs)
 		sort.Ints(vd.ys)
 
 		minSum := vd.scalar()
 
-		output <- fmt.Sprintf("Case #%d: %d\n", testIndex, minSum)
+		output <- fmt.Sprintf("Case #%d: %d\n", vd.testIndex, minSum)
+		done <- true
 	}
-
-	done <- true
 }

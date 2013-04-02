@@ -50,10 +50,35 @@ func main() {
 
 	input := make(chan string)
 	output := make(chan string)
-	done := make(chan bool)
+	doneWriting := make(chan bool)
+	doneFlushing := make(chan bool)
 
 	go utils.ReadLines(*inFile, input)
-	go utils.WriteStrings(*outFile, output, done)
+	go utils.WriteStrings(*outFile, output, doneWriting, doneFlushing)
 
-	minscalar.Execute(input, output, done)
+	numTestCases := utils.ParseInt(<-input)
+
+	if numTestCases < 1 {
+		panic(fmt.Errorf("no testcases available"))
+	}
+
+	done := make(chan bool, numTestCases)
+	cases := make(chan interface{})
+
+	// TODO(uwe): determine from a flag and start as many executors as wished 
+	parser := minscalar.Parse
+	executor := minscalar.Execute
+	go executor(cases, output, done)
+
+	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
+		parser(testIndex, input, cases)
+	}
+
+	for i := 0; i < numTestCases; i++ {
+		<-done
+	}
+
+	doneWriting <- true
+
+	<-doneFlushing
 }

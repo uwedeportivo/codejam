@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+type Parser func(testCaseIndex int, input chan string, output chan interface{})
+type Executor func(input chan interface{}, output chan string, done chan bool)
+
 func ParseInt(str string) int {
 	n, err := strconv.Atoi(str)
 	if err != nil {
@@ -63,7 +66,7 @@ func ReadLines(filename string, c chan string) {
 	}
 }
 
-func WriteStrings(filename string, c chan string, done chan bool) {
+func WriteStrings(filename string, c chan string, done chan bool, doneFlushing chan bool) {
 	outF, err := os.Create(filename)
 
 	if err != nil {
@@ -88,6 +91,8 @@ func WriteStrings(filename string, c chan string, done chan bool) {
 			if err != nil {
 				panic(err)
 			}
+
+			doneFlushing <- true
 			break
 		}
 	}
