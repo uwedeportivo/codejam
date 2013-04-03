@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/uwedeportivo/codejam/milkshakes"
 	"github.com/uwedeportivo/codejam/minscalar"
 	"github.com/uwedeportivo/codejam/utils"
 )
@@ -30,6 +31,7 @@ func main() {
 
 	inFile := flag.String("in", "", "input filename")
 	outFile := flag.String("out", "", "output filename")
+	problem := flag.String("problem", "", "which problem to solve")
 
 	flag.Parse()
 
@@ -43,10 +45,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	if len(*inFile) == 0 || len(*outFile) == 0 {
+	if len(*inFile) == 0 || len(*outFile) == 0 || len(*problem) == 0 {
 		flag.Usage()
 		os.Exit(0)
 	}
+
+	parsers := make(map[string]utils.Parser)
+	executors := make(map[string]utils.Executor)
+
+	parsers["minscalar"] = minscalar.Parse
+	parsers["milkshakes"] = milkshakes.Parse
+	executors["minscalar"] = minscalar.Execute
+	executors["milkshakes"] = milkshakes.Execute
 
 	input := make(chan string)
 	output := make(chan string)
@@ -65,9 +75,9 @@ func main() {
 	done := make(chan bool, numTestCases)
 	cases := make(chan interface{})
 
-	// TODO(uwe): determine from a flag and start as many executors as wished 
-	parser := minscalar.Parse
-	executor := minscalar.Execute
+	parser := parsers[*problem]
+	executor := executors[*problem]
+
 	go executor(cases, output, done)
 
 	for testIndex := 1; testIndex <= numTestCases; testIndex++ {

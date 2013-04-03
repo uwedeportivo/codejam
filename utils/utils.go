@@ -23,10 +23,14 @@ func ParseInt(str string) int {
 	return n
 }
 
-func ParseInts(str string, xs []int) {
+func ParseInts(str string, xs []int) []int {
 	vStrs := strings.Split(str, " ")
-	if len(vStrs) != len(xs) {
+	if xs != nil && len(vStrs) != len(xs) {
 		panic(fmt.Errorf("line: %s did not yield enough numbers", str))
+	}
+
+	if xs == nil {
+		xs = make([]int, len(vStrs))
 	}
 
 	for i := 0; i < len(xs); i++ {
@@ -36,6 +40,7 @@ func ParseInts(str string, xs []int) {
 		}
 		xs[i] = v
 	}
+	return xs
 }
 
 func ReadLines(filename string, c chan string) {
