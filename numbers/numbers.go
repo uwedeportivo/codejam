@@ -1,5 +1,7 @@
 // Copyright (c) 2013 Uwe Hoffmann. All rights reserved.
 
+// writeup: http://www.codemanic.com/notes/papers/numbers/threeplussqrtfive.pdf
+
 package numbers
 
 import (
