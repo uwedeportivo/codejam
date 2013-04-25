@@ -22,6 +22,6 @@ Code Jam 2008, Round 1A
 Code Jam 2012, Round 1B
 -----------------------
 
-- Safety in Numbers
+- Safety in Numbers [Writeup of Solution](http://www.codemanic.com/notes/papers/safety/safety.pdf)
 
 
