@@ -2,6 +2,8 @@
 
 package milkshakes
 
+// problem https://code.google.com/codejam/contest/32016/dashboard#s=p1
+
 import (
 	"bytes"
 	"fmt"

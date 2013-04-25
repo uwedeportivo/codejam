@@ -10,6 +10,7 @@ import (
 	"github.com/uwedeportivo/codejam/milkshakes"
 	"github.com/uwedeportivo/codejam/minscalar"
 	"github.com/uwedeportivo/codejam/numbers"
+	"github.com/uwedeportivo/codejam/safety"
 	"github.com/uwedeportivo/codejam/utils"
 )
 
@@ -57,9 +58,11 @@ func main() {
 	parsers["minscalar"] = minscalar.Parse
 	parsers["milkshakes"] = milkshakes.Parse
 	parsers["numbers"] = numbers.Parse
+	parsers["safety"] = safety.Parse
 	executors["minscalar"] = minscalar.Execute
 	executors["milkshakes"] = milkshakes.Execute
 	executors["numbers"] = numbers.Execute
+	executors["safety"] = safety.Execute
 
 	input := make(chan string)
 	output := make(chan string)

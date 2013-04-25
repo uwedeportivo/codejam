@@ -1,5 +1,6 @@
 // Copyright (c) 2013 Uwe Hoffmann. All rights reserved.
 
+// problem: https://code.google.com/codejam/contest/32016/dashboard#s=p2
 // writeup: http://www.codemanic.com/notes/papers/numbers/threeplussqrtfive.pdf
 
 package numbers
