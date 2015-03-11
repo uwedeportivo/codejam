@@ -8,89 +8,77 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"sort"
 
 	"github.com/uwedeportivo/codejam"
 )
 
-type generator struct {
-	pattern  string
-	buf      []byte
-	tree     [][]byte
-	indices  []int
-	wordSize int
+const offset byte = 'a'
+
+type kids [26]*trie
+
+type trie struct {
+	ks kids
 }
 
-func newGenerator(pattern string, wordSize int) *generator {
-	g := new(generator)
-	g.pattern = pattern
-	g.buf = make([]byte, wordSize)
-	g.tree = make([][]byte, wordSize)
-	g.wordSize = wordSize
+func (t *trie) insert(val []byte) {
+	if len(val) == 0 {
+		return
+	}
+
+	i := val[0] - offset
+
+	if t.ks[i] == nil {
+		t.ks[i] = new(trie)
+	}
+	t.ks[i].insert(val[1:])
+}
+
+func (t *trie) count(pattern [][]byte) int {
+	if len(pattern) == 0 {
+		return 1
+	}
+
+	n := 0
+
+	for _, c := range pattern[0] {
+		i := c - offset
+		if t.ks[i] != nil {
+			n += t.ks[i].count(pattern[1:])
+		}
+	}
+	return n
+}
+
+func string2Pattern(pattern string, wordSize int) [][]byte {
+	if pattern == "" {
+		return nil
+	}
+
+	tree := make([][]byte, wordSize)
 
 	cursor := 0
 	for i := 0; i < wordSize; i++ {
 		if pattern[cursor] == '(' {
 			cursor++
 			for pattern[cursor] != ')' {
-				g.tree[i] = append(g.tree[i], pattern[cursor])
+				tree[i] = append(tree[i], pattern[cursor])
 				cursor++
 			}
 			cursor++
 		} else {
-			g.tree[i] = []byte{pattern[cursor]}
+			tree[i] = []byte{pattern[cursor]}
 			cursor++
 		}
 	}
-
-	g.indices = make([]int, wordSize)
-	return g
+	return tree
 }
 
-func (g *generator) advance() bool {
-	i := g.wordSize - 1
-	for {
-		if g.indices[i] < len(g.tree[i])-1 {
-			g.indices[i] = g.indices[i] + 1
-			return true
-		} else {
-			g.indices[i] = 0
-			i--
-			if i < 0 {
-				return false
-			}
-		}
-	}
-	// unreachable
-	return false
-}
+func solve(pr *codejam.Problem, testCaseIndex int, patternStr string, root *trie, wordSize int) {
+	pattern := string2Pattern(patternStr, wordSize)
 
-func (g *generator) word() string {
-	for i := 0; i < g.wordSize; i++ {
-		g.buf[i] = g.tree[i][g.indices[i]]
-	}
-
-	return string(g.buf)
-}
-
-func solve(pr *codejam.Problem, testCaseIndex int, pattern string, words []string) {
-	fmt.Printf("test case %d: %s\n", testCaseIndex, pattern)
-
-	var nw int
-
-	g := newGenerator(pattern, len(words[0]))
-
-	for ok := true; ok; ok = g.advance() {
-		w := g.word()
-		index := sort.SearchStrings(words, w)
-		if index < len(words) && words[index] == w {
-			nw++
-		}
-	}
+	nw := root.count(pattern)
 
 	pr.Write(fmt.Sprintf("Case #%d: %d\n", testCaseIndex, nw))
-
-	fmt.Printf("finished test case %d: %d\n", testCaseIndex, nw)
 }
 
 func main() {
@@ -117,6 +105,7 @@ func main() {
 		panic(fmt.Errorf("invalid input"))
 	}
 
+	wordSize := ldn[0]
 	dictSize := ldn[1]
 	numTestCases := ldn[2]
 
@@ -124,14 +113,13 @@ func main() {
 		panic(fmt.Errorf("no testcases available"))
 	}
 
-	words := make([]string, dictSize)
+	root := new(trie)
 	for i := 0; i < dictSize; i++ {
-		words[i] = pr.ReadString()
+		root.insert([]byte(pr.ReadString()))
 	}
-	sort.Strings(words)
 
 	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
-		solve(pr, testIndex, pr.ReadString(), words)
+		solve(pr, testIndex, pr.ReadString(), root, wordSize)
 	}
 
 	pr.Close()
