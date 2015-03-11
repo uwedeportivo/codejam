@@ -1,18 +1,20 @@
 // Copyright (c) 2013 Uwe Hoffmann. All rights reserved.
 
 // problem: https://code.google.com/codejam/contest/1836486/dashboard#s=p0
-// writeup: http://www.codemanic.com/notes/papers/safety/safety.pdf
+// writeup: doc/safety.pdf
 
-package safety
+package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"math"
+	"os"
 
 	"strconv"
 
-	"github.com/uwedeportivo/codejam/utils"
+	"github.com/uwedeportivo/codejam"
 )
 
 const epsilon = 0.000001
@@ -71,8 +73,8 @@ func (d *data) search(k int) float64 {
 	return alpha
 }
 
-func Parse(testCaseIndex int, input chan string, output chan interface{}) {
-	ps := utils.ParseInts(<-input, nil)
+func parse(pr *codejam.Problem, testCaseIndex int) *data {
+	ps := pr.ReadInts(nil)
 
 	d := &data{
 		testIndex: testCaseIndex,
@@ -89,35 +91,60 @@ func Parse(testCaseIndex int, input chan string, output chan interface{}) {
 	d.n = float64(len(d.points))
 
 	d.denom = d.n * d.sum
-	output <- d
+	return d
 }
 
-func Execute(input chan interface{}, output chan string, done chan bool) {
-	for {
+func solve(pr *codejam.Problem, d *data) {
+	alphas := make([]float64, len(d.points))
 
-		item := <-input
-		d := item.(*data)
-
-		alphas := make([]float64, len(d.points))
-
-		for k, _ := range d.points {
-			alphas[k] = d.search(k)
-		}
-
-		var buf bytes.Buffer
-
-		first := true
-		for _, v := range alphas {
-
-			if first {
-				first = false
-			} else {
-				buf.WriteString(" ")
-			}
-			buf.WriteString(strconv.FormatFloat(v*100.0, 'f', 9, 64))
-		}
-
-		output <- fmt.Sprintf("Case #%d: %s\n", d.testIndex, buf.String())
-		done <- true
+	for k, _ := range d.points {
+		alphas[k] = d.search(k)
 	}
+
+	var buf bytes.Buffer
+
+	first := true
+	for _, v := range alphas {
+		if first {
+			first = false
+		} else {
+			buf.WriteString(" ")
+		}
+		buf.WriteString(strconv.FormatFloat(v*100.0, 'f', 9, 64))
+	}
+
+	pr.Write(fmt.Sprintf("Case #%d: %s\n", d.testIndex, buf.String()))
+}
+
+func main() {
+	help := flag.Bool("help", false, "show this message")
+	inFile := flag.String("in", "", "input filename (required)")
+	outFile := flag.String("out", "", "output filename (stdout if ommitted)")
+
+	flag.Parse()
+
+	if *help {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	if len(*inFile) == 0 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	pr := codejam.NewProblem(*inFile, *outFile)
+
+	numTestCases := pr.ReadInt()
+
+	if numTestCases < 1 {
+		panic(fmt.Errorf("no testcases available"))
+	}
+
+	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
+		d := parse(pr, testIndex)
+		solve(pr, d)
+	}
+
+	pr.Close()
 }

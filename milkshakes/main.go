@@ -1,15 +1,17 @@
 // Copyright (c) 2013 Uwe Hoffmann. All rights reserved.
 
-package milkshakes
+package main
 
 // problem https://code.google.com/codejam/contest/32016/dashboard#s=p1
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
+	"os"
 	"strconv"
 
-	"github.com/uwedeportivo/codejam/utils"
+	"github.com/uwedeportivo/codejam"
 )
 
 type customer struct {
@@ -28,7 +30,7 @@ type data struct {
 
 type batch []int
 
-func (b batch) print() string {
+func (b batch) String() string {
 	var buf bytes.Buffer
 
 	first := true
@@ -137,9 +139,9 @@ func (d *data) search(b batch) bool {
 	return false
 }
 
-func Parse(testCaseIndex int, input chan string, output chan interface{}) {
-	n := utils.ParseInt(<-input)
-	m := utils.ParseInt(<-input)
+func parse(pr *codejam.Problem, testCaseIndex int) *data {
+	n := pr.ReadInt()
+	m := pr.ReadInt()
 
 	d := &data{
 		flavors:             n,
@@ -150,7 +152,7 @@ func Parse(testCaseIndex int, input chan string, output chan interface{}) {
 	}
 
 	for i := 0; i < m; i++ {
-		nums := utils.ParseInts(<-input, nil)
+		nums := pr.ReadInts(nil)
 
 		c := &customer{
 			malted:   make([]int, 0, nums[0]),
@@ -174,31 +176,58 @@ func Parse(testCaseIndex int, input chan string, output chan interface{}) {
 		d.customers[i] = c
 	}
 
-	output <- d
+	return d
 }
 
-func Execute(input chan interface{}, output chan string, done chan bool) {
-	for {
-		item := <-input
-		d := item.(*data)
+func solve(pr *codejam.Problem, d *data) {
+	b := make(batch, d.flavors)
 
-		b := make(batch, d.flavors)
-
-		for _, c := range d.customers {
-			if len(c.malted) == 1 && len(c.unmalted) == 0 {
-				v := c.malted[0]
-				b[v] = 1
-				d.malted(b, v)
-			}
+	for _, c := range d.customers {
+		if len(c.malted) == 1 && len(c.unmalted) == 0 {
+			v := c.malted[0]
+			b[v] = 1
+			d.malted(b, v)
 		}
-
-		found := d.search(b)
-
-		if found {
-			output <- fmt.Sprintf("Case #%d: %s\n", d.testIndex, b.print())
-		} else {
-			output <- fmt.Sprintf("Case #%d: IMPOSSIBLE\n", d.testIndex)
-		}
-		done <- true
 	}
+
+	found := d.search(b)
+
+	if found {
+		pr.Write(fmt.Sprintf("Case #%d: %s\n", d.testIndex, b))
+	} else {
+		pr.Write(fmt.Sprintf("Case #%d: IMPOSSIBLE\n", d.testIndex))
+	}
+}
+
+func main() {
+	help := flag.Bool("help", false, "show this message")
+	inFile := flag.String("in", "", "input filename (required)")
+	outFile := flag.String("out", "", "output filename (stdout if ommitted)")
+
+	flag.Parse()
+
+	if *help {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	if len(*inFile) == 0 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	pr := codejam.NewProblem(*inFile, *outFile)
+
+	numTestCases := pr.ReadInt()
+
+	if numTestCases < 1 {
+		panic(fmt.Errorf("no testcases available"))
+	}
+
+	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
+		d := parse(pr, testIndex)
+		solve(pr, d)
+	}
+
+	pr.Close()
 }

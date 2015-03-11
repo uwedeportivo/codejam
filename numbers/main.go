@@ -1,14 +1,16 @@
 // Copyright (c) 2013 Uwe Hoffmann. All rights reserved.
 
 // problem: https://code.google.com/codejam/contest/32016/dashboard#s=p2
-// writeup: http://www.codemanic.com/notes/papers/numbers/threeplussqrtfive.pdf
+// writeup: doc/threeplussqrtfive.pdf
 
-package numbers
+package main
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
-	"github.com/uwedeportivo/codejam/utils"
+	"github.com/uwedeportivo/codejam"
 )
 
 type data struct {
@@ -24,15 +26,15 @@ var hundredsLookup []int = []int{2, 6, 28, 144, 752, 936, 608, 904, 992, 336, 48
 var hundredsOffset int = 3
 var hundredsPeriod int = 100
 
-func Parse(testCaseIndex int, input chan string, output chan interface{}) {
-	n := utils.ParseInt(<-input)
+func parse(pr *codejam.Problem, testCaseIndex int) *data {
+	n := pr.ReadInt()
 
 	d := &data{
 		num:       n,
 		testIndex: testCaseIndex,
 	}
 
-	output <- d
+	return d
 }
 
 func mod10(v int) int {
@@ -43,41 +45,68 @@ func mod10(v int) int {
 	return r
 }
 
-func Execute(input chan interface{}, output chan string, done chan bool) {
-	for {
-		item := <-input
-		d := item.(*data)
+func solve(pr *codejam.Problem, d *data) {
+	var unitsDigit, tensDigit, hundredsDigit int
 
-		var unitsDigit, tensDigit, hundredsDigit int
+	if d.num == 0 {
+		unitsDigit, tensDigit, hundredsDigit = 1, 0, 0
+	} else if d.num == 1 {
+		unitsDigit, tensDigit, hundredsDigit = 5, 0, 0
+	} else if d.num == 2 {
+		unitsDigit, tensDigit, hundredsDigit = 7, 2, 0
+	} else {
+		v := (d.num - hundredsOffset) % hundredsPeriod
+		u := hundredsLookup[v+hundredsOffset] - 1
 
-		if d.num == 0 {
-			unitsDigit, tensDigit, hundredsDigit = 1, 0, 0
-		} else if d.num == 1 {
-			unitsDigit, tensDigit, hundredsDigit = 5, 0, 0
-		} else if d.num == 2 {
-			unitsDigit, tensDigit, hundredsDigit = 7, 2, 0
-		} else {
-			v := (d.num - hundredsOffset) % hundredsPeriod
-			u := hundredsLookup[v+hundredsOffset] - 1
+		unitsDigit = mod10(u)
 
-			unitsDigit = mod10(u)
+		if u >= 10 {
+			u = (u - unitsDigit) / 10
+
+			tensDigit = mod10(u)
 
 			if u >= 10 {
-				u = (u - unitsDigit) / 10
+				u = (u - tensDigit) / 10
 
-				tensDigit = mod10(u)
-
-				if u >= 10 {
-					u = (u - tensDigit) / 10
-
-					hundredsDigit = mod10(u)
-				}
+				hundredsDigit = mod10(u)
 			}
 		}
-
-		output <- fmt.Sprintf("Case #%d: %d%d%d\n", d.testIndex, hundredsDigit, tensDigit, unitsDigit)
-		done <- true
 	}
+
+	pr.Write(fmt.Sprintf("Case #%d: %d%d%d\n", d.testIndex, hundredsDigit, tensDigit, unitsDigit))
+}
+
+func main() {
+	help := flag.Bool("help", false, "show this message")
+	inFile := flag.String("in", "", "input filename (required)")
+	outFile := flag.String("out", "", "output filename (stdout if ommitted)")
+
+	flag.Parse()
+
+	if *help {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	if len(*inFile) == 0 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	pr := codejam.NewProblem(*inFile, *outFile)
+
+	numTestCases := pr.ReadInt()
+
+	if numTestCases < 1 {
+		panic(fmt.Errorf("no testcases available"))
+	}
+
+	for testIndex := 1; testIndex <= numTestCases; testIndex++ {
+		d := parse(pr, testIndex)
+		solve(pr, d)
+	}
+
+	pr.Close()
 }
 
 /*
