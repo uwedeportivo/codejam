@@ -11,3 +11,6 @@ Some problems need a little math derivation and for these there are writeups.
 - [Safety](https://code.google.com/codejam/contest/1836486/dashboard#s=p0) _([Writeup](safety/doc/safety.pdf))_
 
 - [Alien Language](https://code.google.com/codejam/contest/90101/dashboard#s=p0)
+
+- [Rope Intranet](https://code.google.com/codejam/contest/619102/dashboard#s=p0)
+
