@@ -119,7 +119,7 @@ func solve(pr *codejam.Problem, d *data) {
 func main() {
 	help := flag.Bool("help", false, "show this message")
 	inFile := flag.String("in", "", "input filename (required)")
-	outFile := flag.String("out", "", "output filename (stdout if ommitted)")
+	outFile := flag.String("out", "", "output filename (stdout if omitted)")
 
 	flag.Parse()
 
