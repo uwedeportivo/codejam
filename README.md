@@ -15,3 +15,5 @@ Some problems need a little math derivation and for these there are writeups.
 - [Rope Intranet](https://code.google.com/codejam/contest/619102/dashboard#s=p0)
 
 - [File Fix-it](https://code.google.com/codejam/contest/635101/dashboard#s=p0)
+
+- [All Your Base](https://code.google.com/codejam/contest/189252/dashboard#s=p0)
