@@ -17,3 +17,5 @@ Some problems need a little math derivation and for these there are writeups.
 - [File Fix-it](https://code.google.com/codejam/contest/635101/dashboard#s=p0)
 
 - [All Your Base](https://code.google.com/codejam/contest/189252/dashboard#s=p0)
+
+- [Center of Mass, Fireflies](https://code.google.com/codejam/contest/189252/dashboard#s=p1)

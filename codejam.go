@@ -67,6 +67,35 @@ func parseInts(str string, xs []int) []int {
 	return xs
 }
 
+func parseFloat(str string) float64 {
+	r, err := strconv.ParseFloat(str, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	return r
+}
+
+func parseFloats(str string, xs []float64) []float64 {
+	vStrs := strings.Split(str, " ")
+	if xs != nil && len(vStrs) != len(xs) {
+		panic(fmt.Errorf("line: %s did not yield enough numbers", str))
+	}
+
+	if xs == nil {
+		xs = make([]float64, len(vStrs))
+	}
+
+	for i := 0; i < len(xs); i++ {
+		v, err := strconv.ParseFloat(vStrs[i], 64)
+		if err != nil {
+			panic(err)
+		}
+		xs[i] = v
+	}
+	return xs
+}
+
 type Problem struct {
 	sc   *bufio.Scanner
 	fin  *os.File
@@ -115,6 +144,14 @@ func (pr *Problem) ReadInts(xs []int) []int {
 
 func (pr *Problem) ReadInt() int {
 	return parseInt(pr.nextLine())
+}
+
+func (pr *Problem) ReadFloats(xs []float64) []float64 {
+	return parseFloats(pr.nextLine(), xs)
+}
+
+func (pr *Problem) ReadFloat() float64 {
+	return parseFloat(pr.nextLine())
 }
 
 func (pr *Problem) ReadString() string {
