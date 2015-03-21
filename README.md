@@ -19,3 +19,5 @@ Some problems need a little math derivation and for these there are writeups.
 - [All Your Base](https://code.google.com/codejam/contest/189252/dashboard#s=p0)
 
 - [Center of Mass, Fireflies](https://code.google.com/codejam/contest/189252/dashboard#s=p1)
+
+- [Bribe the Prisoner](https://code.google.com/codejam/contest/189252/dashboard#s=p2)
