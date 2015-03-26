@@ -96,6 +96,35 @@ func parseFloats(str string, xs []float64) []float64 {
 	return xs
 }
 
+func parseByte(str string) byte {
+	n, err := strconv.Atoi(str)
+	if err != nil {
+		panic(err)
+	}
+
+	return byte(n)
+}
+
+func parseBytes(str string, xs []byte) []byte {
+	vStrs := strings.Split(str, " ")
+	if xs != nil && len(vStrs) != len(xs) {
+		panic(fmt.Errorf("line: %s did not yield enough numbers", str))
+	}
+
+	if xs == nil {
+		xs = make([]byte, len(vStrs))
+	}
+
+	for i := 0; i < len(xs); i++ {
+		v, err := strconv.Atoi(vStrs[i])
+		if err != nil {
+			panic(err)
+		}
+		xs[i] = byte(v)
+	}
+	return xs
+}
+
 type Problem struct {
 	sc   *bufio.Scanner
 	fin  *os.File
@@ -152,6 +181,14 @@ func (pr *Problem) ReadFloats(xs []float64) []float64 {
 
 func (pr *Problem) ReadFloat() float64 {
 	return parseFloat(pr.nextLine())
+}
+
+func (pr *Problem) ReadBytes(xs []byte) []byte {
+	return parseBytes(pr.nextLine(), xs)
+}
+
+func (pr *Problem) ReadByte() byte {
+	return parseByte(pr.nextLine())
 }
 
 func (pr *Problem) ReadString() string {

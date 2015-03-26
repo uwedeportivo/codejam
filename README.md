@@ -21,3 +21,5 @@ Some problems need a little math derivation and for these there are writeups.
 - [Center of Mass, Fireflies](https://code.google.com/codejam/contest/189252/dashboard#s=p1)
 
 - [Bribe the Prisoner](https://code.google.com/codejam/contest/189252/dashboard#s=p2)
+
+- [Checkerboard Matrix](https://code.google.com/codejam/contest/7214486/dashboard#s=p0)
