@@ -2,6 +2,18 @@
 
 // problem: https://code.google.com/codejam/contest/7214486/dashboard#s=p0
 
+// key insights:
+//
+// 1.) if one row is checkered, all other rows must be checkered
+//     (assume not: to heal two adjacent zeros or ones would destroy other checkered row)
+//
+// 2.) same thing for columns
+//
+// 3.) to get minimal swaps in row: find misplace then find first complement misplace and swap
+//
+// 4.) first do row zero and check all other rows for checkered
+//     then do column zero and check all other columns for checkered
+
 package main
 
 import (
