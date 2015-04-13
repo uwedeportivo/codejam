@@ -25,3 +25,5 @@ Some problems need a little math derivation and for these there are writeups.
 - [Checkerboard Matrix](https://code.google.com/codejam/contest/7214486/dashboard#s=p0)
 
 - [Power Swapper](https://code.google.com/codejam/contest/7214486/dashboard#s=p1)
+
+- [Symmetric Trees](https://code.google.com/codejam/contest/7214486/dashboard#s=p2)
